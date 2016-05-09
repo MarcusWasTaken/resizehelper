@@ -29,6 +29,7 @@ var initialDevices = [
   { name: 'Nokia N9 - landscape', width: 640, density: 1 },
   { name: 'iPad Pro - standing', width: 2732, density: 2 },
   { name: 'iPad Pro - landscape', width: 2048, density: 2 }
+  /*{ name: 'test', width: 400, density: 2, flagged: true }*/
 ];
 
 // Default values for classes
@@ -168,6 +169,7 @@ function Size(options) {
   self.id = set.id;
   self.name = ko.observable(set.name);
   self.width = ko.observable(set.width);
+  self.height = ko.observable(set.width);
   self.editing = ko.observable();
 
   if(set.editing !== undefined) {
@@ -239,13 +241,15 @@ function Device(options) {
     var sizeFound = false;
 
     if(!$.isEmptyObject(viewmodel.activeImage()) && viewmodel.activeImage().sizes().length > 0) { // <-- check if there are sizes to calculate with
-      var displayWidth;
+      var displayWidth = false;
+      var sizes = viewmodel.activeImage().sizes();
+      var breakpoints = viewmodel.activeImage().breakpoints();
 
-      for (var key1 in viewmodel.activeImage().sizes()) {
-        var size = viewmodel.activeImage().sizes()[key1];
+      for (var key1 in sizes) {
+        var size = sizes[key1];
 
-        for (var key2 in viewmodel.activeImage().breakpoints()) {
-          var breakpoint = viewmodel.activeImage().breakpoints()[key2];
+        for (var key2 in breakpoints) {
+          var breakpoint = breakpoints[key2];
           var breakpointTest = breakpoint.test(self.width);
           if (breakpointTest) {
             displayWidth = breakpointTest;
@@ -253,20 +257,27 @@ function Device(options) {
           }
         }
 
-        var deviceLoss = Math.round((size.width() - self.density * displayWidth) / size.width() * 100);
+        if (displayWidth) {
+          var displayHeight = displayWidth;
 
-        if (deviceLoss >= 0 && (deviceLoss < loss || typeof loss === 'undefined')) {
-          loss = deviceLoss;
-          self.usingSize(size.width());
-          sizeFound = true;
+          var deviceLoss = size.width() * size.height() - (self.density * displayWidth) * (self.density * displayHeight);
+          var lossInKb = deviceLoss * 4 / 1024;
+
+          if (deviceLoss >= 0 && (deviceLoss < loss || typeof loss === 'undefined')) {
+            loss = lossInKb;
+            self.usingSize(size.width());
+            sizeFound = true;
+          }
         }
       }
     }
 
     if (!sizeFound) {
       self.usingSize('-');
+      return '-';
+    } else {
+      return loss != 0 ? Math.round((loss + 0.00001) / 1024 * 10 ) / 10 + ' MB' : loss;
     }
-    return sizeFound ? loss + '%' : '-';
   });
 }
 
@@ -368,10 +379,11 @@ var viewmodel = new DevicesViewModel();
 // setting up some initial data, this will be moved once local storage is implemented.
 // also, intitial data might be removed once the 'intro' is in place.
 
-/*viewmodel.addImage({ name: 'Example image' });
+viewmodel.addImage({ name: 'Example image' });
+viewmodel.addBreakpoint({ displayWidth: 100 });
 viewmodel.addSize({ width: 1600 });
+viewmodel.addSize({ width: 2000 });
 viewmodel.addSize({ width: 1200 });
-viewmodel.addSize({ width: 2000 });*/
 
 $.map(initialDevices, function (item) { viewmodel.addDevice(item); });
 
