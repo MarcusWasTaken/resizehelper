@@ -1,4 +1,8 @@
 
+$.fn.exists = function() {
+  return this.length !== 0;
+}
+
 var initialDevices = [
   { name: 'Desktop', width: 1920, density: 1, flagged: true },
   { name: 'iPhone4 - standing', width: 320, density: 2, flagged: true },
@@ -401,7 +405,6 @@ ko.bindingHandlers.selected = {
   update: function(element, valueAccessor) {
     var value = ko.unwrap(valueAccessor());
 
-
     if (value) {
       element.select();
     }
@@ -409,3 +412,54 @@ ko.bindingHandlers.selected = {
 };
 
 ko.applyBindings(viewmodel);
+
+
+$('[data-toggle="accordion').each(function() {
+  var $this = $(this);
+  $this.set = {
+    target: $($this.data('target')),
+    parent: $($this.data('parent')),
+    isActive: false,
+  };
+
+  if(!$this.set.target.hasClass('collapse')) {
+    return; // fail, target needs to has class collapse.
+  }
+
+  if($this.set.parent.exists()) {
+    $this.on('click', function() {
+      if($this.set.parent.find($('.collapsing')).exists()) {
+        return;
+      }
+      $this.set.isActive = $this.hasClass('active');
+
+      $this.set.parent.find($('.collapse.in')).collapse('hide');
+      $this.set.parent.find($('[data-toggle="accordion"]')).removeClass('active');
+
+      if(!$this.set.isActive) {
+        $this.addClass('active');
+        $this.set.target.collapse('show');
+      }
+
+    });
+  } else if(!$this.set.parent.exists()) {
+    $this.on('click', function() {
+      if($this.set.target.hasClass('collapsing')) {
+        return;
+      }
+      $this.set.isActive = $this.hasClass('active');
+
+      if($this.set.isActive) {
+        $this.removeClass('active');
+        $this.set.target.collapse('hide');
+      } else {
+        $this.addClass('active');
+        $this.set.target.collapse('show');
+      }
+
+    });
+  }
+});
+
+
+/*$('[data-toggle="tooltip"]').tooltip();*/

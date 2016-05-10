@@ -1,56 +1,94 @@
-<div class="panel panel-default">
-  <div class="panel-heading">
+<div class="panel panel-primary">
+  <div class="panel-heading active" data-toggle="accordion" data-target="#size">
     <h4 class="panel-title">Sizes</h4>
+    <span class="glyphicon glyphicon-chevron-down"></span>
   </div>
 
-  <div class="panel-body">
-    <p><a href="#sizeDesc" data-toggle="collapse">What is this?</a></p>
-    <div class="collapse" id="sizeDesc">
-      <div class="well well-sm">
-        <p>Here you can define the different sizes of the image that is available for the browser to pick between.</p>
-        <p>When deciding which size will be used for a device the browser will first look at the queries to check how large the image will be rendered and then multiply that by the devices pixel density.<br><small>Example: If the image is 33vw on a <em>iPad - standing</em> the calculation would be <em>768 * .33 * 2 = 506.88</em>; so a size with 0 loss would be 506 wide.</small></p>
-      </div>  
-    </div>
-    <p><a href="#sizeHow" data-toggle="collapse">How to use?</a></p>
-    <div class="collapse" id="sizeHow">
-      <div class="well well-sm">
-        <p>Either add a new size manually or use the generate button <em>(not yet implemented)</em> to add new sizes with the parameters <em>(not yet implemented)</em> which will be optimised to have as little loss as possible across the flagged devices.</p>
-        <p>Note: each size's name is used in the output <em>(not yet implemented)</em> and should represent what each size are named on your server. (the size names can also be used as a suffix to the image name <em>(not yet implemented)</em>)</p>
+  <div class="collapse in" id="size">
+    <div class="panel-body">
+      <div class="btn-flexgroup btn-group-sm">
+        <a class="btn btn-default" type="button" data-toggle="accordion" data-parent="#size" data-target="#sizeDesc">
+          What is this?
+        </a>
+        <a class="btn btn-default" type="button" data-toggle="accordion" data-parent="#size" data-target="#sizeHow">
+          How to use?
+        </a>
+        <a data-bind="click: function() { addSize({ editing: 'name' }) }" type="button" class="btn btn-sm btn-success">
+          Add a new size&nbsp;&nbsp;<span class="glyphicon glyphicon-plus"></span>
+        </a>
       </div>
     </div>
 
-    <button data-bind="click: function() { addSize({ editing: 'name' }) }" type="button" class="btn btn-sm btn-success">
-      Add a new size&nbsp;&nbsp;<span class="glyphicon glyphicon-plus"></span>
-    </button>
-  </div>
+    <div class="collapse" id="sizeDesc">
+      <div class="panel-body" style="padding-top: 0;">
+        <div class="well well-sm">
+          <p>Here you can define the different sizes of the image that is available for the browser to pick between.</p>
+          <p>When deciding which size will be used for a device the browser will first look at the queries to check how large the image will be rendered and then multiply that by the devices pixel density.<br><small>Example: If the image is 33vw on a <em>iPad - standing</em> the calculation would be <em>768 * .33 * 2 = 506.88</em>; so a size with 0 loss would be 506 wide.</small></p>
+        </div>  
+      </div>
+    </div>
 
-  <table data-bind="visible: activeImage().sizes().length > 0" class="table">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th colspan="3">Width</th>
-      </tr>
-    </thead>
-    <tbody data-bind="sortable: { data: activeImage().sizes, connectClass: 'sort-sizes', options: { handle: '.sortable-handle' } }">
-      <tr>
-        <td style="width: 50%; vertical-align: middle;">
-          <div data-bind="visible: !isEditing(name)">
-            <span style="width: 100%; display: inline-block;" data-bind="text: name, click: function() { editing(name) }"></span>
-          </div>
-          <div data-bind="visibleAndSelect: isEditing(name)">
-            <input class="form-control" type="text" data-bind="value: name, event: { blur: function() { clearEdit(name) } }">
-          </div>
-        </td>
-        <td>
-          <input class="form-control" type="number" data-bind="value: width, event: { onfocus: function() { editing(width) }, blur: function() { clearEdit(width) } }">
-        </td>
-        <td class="sortable-handle" style="vertical-align: middle;">
-          <span class="glyphicon glyphicon-move"></span>
-        </td>
-        <td style="vertical-align: middle;">
-          <button data-bind="click: function() { $root.removeSize(id) }" type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+    <div class="collapse" id="sizeHow">
+      <div class="panel-body" style="padding-top: 0;">
+        <div class="well well-sm">
+          <p>Either add a new size manually or use the generate button <em>(not yet implemented)</em> to add new sizes with the parameters <em>(not yet implemented)</em> which will be optimised to have as little loss as possible across the flagged devices.</p>
+          <p>Note: each size's name is used in the output <em>(not yet implemented)</em> and should represent what each size are named on your server. (the size names can also be used as a suffix to the image name <em>(not yet implemented)</em>)</p>
+        </div>
+      </div>
+    </div>
+
+    <table data-bind="visible: activeImage().sizes().length > 0" class="table" style="border-top: 1px solid #ddd;">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th colspan="3">Width</th>
+        </tr>
+      </thead>
+      <tbody data-bind="sortable: { data: activeImage().sizes, connectClass: 'sort-sizes', options: { handle: '.sortable-handle' } }">
+        <tr>
+          <td style="width: 50%; vertical-align: middle;">
+            <div data-bind="visible: !isEditing(name)">
+              <p class="form-control-static" style="cursor: text;" data-bind="text: name, click: function() { editing(name) }"></p>
+            </div>
+            <div data-bind="visibleAndSelect: isEditing(name)">
+              <input class="form-control" type="text" data-bind="value: name, event: { blur: function() { clearEdit(name) } }">
+            </div>
+          </td>
+          <td>
+            <input class="form-control" type="number" data-bind="value: width, event: { onfocus: function() { editing(width) }, blur: function() { clearEdit(width) } }">
+          </td>
+          <td class="sortable-handle" style="vertical-align: middle;">
+            <span class="glyphicon glyphicon-move"></span>
+          </td>
+          <td style="vertical-align: middle;">
+            <button data-bind="click: function() { $root.removeSize(id) }" type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="table table-justified" style="border-top: 1px solid #ddd;">
+      <thead>
+        <tr>
+          <th style="width: 33%">Name</th>
+          <th>Width</th>
+          <th>Height</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <p class="form-control-static">Original</p>
+          </td>
+          <td>
+            <p class="form-control-static">2000</p>
+            <!-- <input type="number" class="form-control" value="2000"> -->
+          </td>
+          <td>
+            <p class="form-control-static">1400</p>
+            <!-- <input type="number" class="form-control" value="1000"> -->
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
