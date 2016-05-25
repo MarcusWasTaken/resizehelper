@@ -10,7 +10,9 @@ $icon-font-path: '../fonts/';
 
 .table {
   tr {
-    background-color: white;
+    &.ui-sortable-helper {
+      background-color: white;
+    }
   }
   td {
     vertical-align: center;
@@ -57,34 +59,41 @@ $icon-font-path: '../fonts/';
   }
 }
 
-.table-justified {
-  th, td {
-
-  }
-}
-
 [title] {
   cursor: help;
 }
 
-.panel-heading[data-toggle="accordion"] {
+.panel-heading[data-toggle="accordion"], .panel-toggle {
   cursor: pointer;
   position: relative;
   > .glyphicon {
+    @extend .glyphicon-pencil;
     position: absolute;
     top: 50%;
     right: 15px;
     transform: translateY(-50%);
+    &:after {
+      content: 'Edit';
+      position: absolute;
+      right: 22px;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
   }
   &.active > .glyphicon {
-    @extend .glyphicon-chevron-up;
+    @extend .glyphicon-lock;
+    &:after {
+      content: 'Lock';
+    }
+  }
+  &:hover > .glyphicon:after {
+    text-decoration: underline;
   }
 }
 
 .panel > .collapse {
-  border-bottom-right-radius: 4px;
+  /* border-bottom-right-radius: 4px;
   border-bottom-left-radius: 4px;
-  overflow: hidden;
+  overflow: hidden; */
 }
 
 .panel .table {

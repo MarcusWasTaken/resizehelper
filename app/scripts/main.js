@@ -1,8 +1,4 @@
 
-$.fn.exists = function() {
-  return this.length !== 0;
-}
-
 var initialDevices = [
   { name: 'Desktop', width: 1920, density: 1, flagged: true },
   { name: 'iPhone4 - standing', width: 320, density: 2, flagged: true },
@@ -41,13 +37,15 @@ var defaults = {
   image: {
     name: 'image',
     active: false,
-    editing: undefined,
-    showProperties: false
+    size: {
+      name: 'Original',
+      width: 1920,
+      height: 1080
+    }
   },
   size: {
     name: 'size',
-    width: '100',
-    editing: undefined
+    width: 100
   },
   breakpoint: {
     type: 'min-width',
@@ -85,6 +83,20 @@ function spaces(quantity) {
   }
   return string;
 }
+$.fn.exists = function() {
+  return this.length !== 0;
+}
+Object.allKeys = function(obj) {
+  var result = [];
+  for (var prop in obj) {
+    var value = obj[prop];
+    if (typeof value === 'object') {
+      result = result.concat(Object.allKeys(value));
+    }
+    result.push(prop);
+  }
+  return result;
+}
 
 
 // Classes
@@ -94,32 +106,12 @@ function Image(options) {
 
   self.id = set.id;
   self.name = ko.observable(set.name);
-  self.sizes = ko.observableArray(set.sizes);
-  self.breakpoints = ko.observableArray(set.breakpoints);
   self.active = ko.observable(set.active);
-  self.showProperties = ko.observable(set.showProperties);
-  self.editing = ko.observable();
-
-  if(set.editing !== undefined) {
-    self.editing(self[set.editing]);
-  }
-  self.isEditing = function(value) {
-    return value === self.editing();
-  };
-  self.clearEdit = function(value) {
-    if (value === self.editing()) {
-      self.editing(null);
-    }
-  };
-
-  ko.computed(function() {
-    if(self.showProperties()) { return; }
-
-    if(self.editing() === null || self.sizes().length > 0 || self.breakpoints().length > 0) {
-      self.showProperties(true);
-    }
-  });
-
+  self.size = new Size(set.size);
+  self.sizes = ko.observableArray([]);
+  self.breakpoint = new Breakpoint(set.breakpoint);
+  self.breakpoints = ko.observableArray();
+  self.editing = ko.observable(self[set.editing]);
   self.output = ko.computed(function() {
     var outputHtml = '&lt;img ';
     var sizes = self.sizes();
@@ -165,7 +157,30 @@ function Image(options) {
 
     return outputHtml;
   });
+
+  $.each(set.sizes, function() {
+    self.sizes.push(new Size(this));
+  });
+  $.each(set.breakpoints, function() {
+    self.breakpoints.push(new Breakpoint(this));
+  });
 }
+Image.prototype.isEditing = function(value) {
+  return value === this.editing();
+}
+Image.prototype.clearEdit = function(value) {
+  if (value === this.editing()) {
+    this.editing(null);
+  }
+}
+Image.prototype.toggleEdit = function(value) {
+  if (this.isEditing(value)) {
+    this.clearEdit(value);
+  } else {
+    this.editing(value);
+  }
+}
+
 function Size(options) {
   var self = this;
   var set = $.extend({}, defaults.size, options);
@@ -173,10 +188,21 @@ function Size(options) {
   self.id = set.id;
   self.name = ko.observable(set.name);
   self.width = ko.observable(set.width);
-  self.height = ko.observable(set.width);
-  self.editing = ko.observable();
+  /*self.editing = ko.observable();*/
+  self.raw = set.raw;
 
-  if(set.editing !== undefined) {
+  if(self.id === undefined) { // <- reasoning being all sizes thats in the arr should have gotten an id
+    self.height = ko.observable(set.height);
+    self.ratio = ko.computed(function() {
+      return self.height() / self.width();
+    });
+  } else {
+    self.height = ko.computed(function() {
+      return Math.ceil(self.width() * viewmodel.activeImage().size.ratio());
+    });
+  }
+
+  /*if(set.editing !== undefined) {
     self.editing(self[set.editing]);
   }
   self.isEditing = function(value) {
@@ -186,7 +212,7 @@ function Size(options) {
     if (value === self.editing()) {
       self.editing(null);
     }
-  };
+  };*/
 }
 function Breakpoint(options) {
   var self = this;
@@ -262,7 +288,7 @@ function Device(options) {
         }
 
         if (displayWidth) {
-          var displayHeight = displayWidth;
+          var displayHeight = displayWidth * viewmodel.activeImage().size.ratio();
 
           var deviceLoss = size.width() * size.height() - (self.density * displayWidth) * (self.density * displayHeight);
           var lossInKb = deviceLoss * 4 / 1024;
@@ -280,8 +306,7 @@ function Device(options) {
       self.usingSize('-');
       return '-';
     } else {
-      return loss != 0 ? Math.round((loss + 0.00001) / 1024 * 10 ) / 10 + ' MB' : loss;
-    }
+      return loss != 0 ? Math.round((loss + 0.00001) / 1024 * 10 ) / 10 + ' MB' : loss}
   });
 }
 
@@ -291,23 +316,16 @@ function DevicesViewModel() {
   var self = this;
 
   self.images = ko.observableArray();
-  self.activeImage = ko.observable(new Image());
+  self.activeImage = ko.observable();
+  self.editingImage = ko.observable();
   self.devices = ko.observableArray();
 
   self.addImage = function(options) {
-    // generate unique id
     var newId = genUniqueProperty(self.images(), 'id');
-
-    // merge id to the options
     options = $.extend({}, options, { id: newId });
-
-    // create the new image
     self.images.push(new Image(options));
 
-    // set image as active if it's the first created
-    if(self.images().length === 1) {
-      self.setActiveImage(newId);
-    }
+    self.setActiveImage(newId);
   };
   self.removeImage = function(id) {
     var image = ko.utils.arrayFirst(self.images(), function(image) { return image.id === id; });
@@ -325,7 +343,7 @@ function DevicesViewModel() {
     if(image.active()) { return; }
 
     // remove active from the already active image
-    if(self.activeImage().active) {
+    if(!$.isEmptyObject(self.activeImage()) && self.activeImage().active) {
       self.activeImage().active(false);
     }
 
@@ -334,7 +352,7 @@ function DevicesViewModel() {
     self.activeImage(image);
   };
   self.clearActiveImage = function() {
-    self.activeImage(new Image());
+    self.activeImage(undefined);
   };
   self.addSize = function(options) {
     // generate unique id
@@ -375,7 +393,6 @@ function DevicesViewModel() {
       $('#js-output').html(self.activeImage().output());
     }
   });
-
 }
 
 var viewmodel = new DevicesViewModel();
@@ -383,11 +400,7 @@ var viewmodel = new DevicesViewModel();
 // setting up some initial data, this will be moved once local storage is implemented.
 // also, intitial data might be removed once the 'intro' is in place.
 
-viewmodel.addImage({ name: 'Example image' });
-viewmodel.addBreakpoint({ displayWidth: 100 });
-viewmodel.addSize({ width: 1600 });
-viewmodel.addSize({ width: 2000 });
-viewmodel.addSize({ width: 1200 });
+viewmodel.addImage();
 
 $.map(initialDevices, function (item) { viewmodel.addDevice(item); });
 
@@ -414,52 +427,45 @@ ko.bindingHandlers.selected = {
 ko.applyBindings(viewmodel);
 
 
-$('[data-toggle="accordion').each(function() {
+function panelToggle(el, val) {
+  var $this = $(el);
+  var $target = $($this.data('target'));
+  var isActive = $this.hasClass('active');
+  //var targetArr = $this.data('target').replace('#', '');
+
+  console.log($(el));
+  console.log(val);
+
+  if (isActive) {
+
+  } else {
+
+  }
+
+}
+
+$('[data-toggle="visibility"]').on('click', function() {
   var $this = $(this);
-  $this.set = {
-    target: $($this.data('target')),
-    parent: $($this.data('parent')),
-    isActive: false,
-  };
+  var $target = $($this.data('target'));
+  var $parent = $($this.data('parent'));
+  var isActive = $this.hasClass('active');
 
-  if(!$this.set.target.hasClass('collapse')) {
-    return; // fail, target needs to has class collapse.
+  if($parent.exists()) {
+    $parent.find('.collapse.in').removeClass('in');
+    $parent.find('[data-toggle="visibility"].active').removeClass('active');
   }
 
-  if($this.set.parent.exists()) {
-    $this.on('click', function() {
-      if($this.set.parent.find($('.collapsing')).exists()) {
-        return;
-      }
-      $this.set.isActive = $this.hasClass('active');
-
-      $this.set.parent.find($('.collapse.in')).collapse('hide');
-      $this.set.parent.find($('[data-toggle="accordion"]')).removeClass('active');
-
-      if(!$this.set.isActive) {
-        $this.addClass('active');
-        $this.set.target.collapse('show');
-      }
-
-    });
-  } else if(!$this.set.parent.exists()) {
-    $this.on('click', function() {
-      if($this.set.target.hasClass('collapsing')) {
-        return;
-      }
-      $this.set.isActive = $this.hasClass('active');
-
-      if($this.set.isActive) {
-        $this.removeClass('active');
-        $this.set.target.collapse('hide');
-      } else {
-        $this.addClass('active');
-        $this.set.target.collapse('show');
-      }
-
-    });
+  if(isActive) {
+    $this.removeClass('active');
+    $target.removeClass('in');
+  } else {
+    $this.addClass('active');
+    $target.addClass('in');
   }
+
 });
+
+
 
 
 /*$('[data-toggle="tooltip"]').tooltip();*/

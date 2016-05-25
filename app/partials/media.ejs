@@ -1,32 +1,31 @@
-<div class="panel panel-primary">
-  <div class="panel-heading active" data-toggle="accordion" data-target="#media">
+<div class="panel panel-primary" data-bind="with: activeImage">
+  <div class="panel-heading" data-toggle="accordion" data-target="#media">
     <h4 class="panel-title">Media queries</h4>
     <span class="glyphicon glyphicon-chevron-down"></span>
   </div>
-  <div class="collapse in" id="media">
+
+  <div class="collapse" id="media">
     <div class="panel-body">
       <div class="btn-flexgroup btn-group-sm">
-        <a class="btn btn-default" type="button" data-toggle="accordion" data-parent="#media" data-target="#mediaDesc">
+        <a class="btn btn-default" data-toggle="accordion" data-parent="#media" data-target="#mediaDesc">
           What is this?
         </a>
-        <a class="btn btn-default" type="button" data-toggle="accordion" data-parent="#media" data-target="#mediaHow">
+        <a class="btn btn-default" data-toggle="accordion" data-parent="#media" data-target="#mediaHow">
           How to use?
         </a>
-        <a class="btn btn-success" type="button" data-bind="click: function() { addBreakpoint() }">
+        <a class="btn btn-success" data-bind="click: function() { $root.addBreakpoint() }">
           Add a new query&nbsp;&nbsp;<span class="glyphicon glyphicon-plus"></span>
         </a>
       </div>
     </div>
-
     <div class="collapse" id="mediaDesc">
       <div class="panel-body" style="padding-top: 0;">
         <div class="well well-sm">
           <p>The media queries defines how large the image will be rendered across different devices.</p>
           <p>These definitions are used by the browser to determine which size of the image to use.<br><small>Example: If you define an image to be displayed at 25vw on <em>Desktop</em> it will look for an image that is 25% of it's width (1920 / 4 = 480) or larger.</small></p>
-        </div>  
+        </div>
       </div>
     </div>
-
     <div class="collapse" id="mediaHow">
       <div class="panel-body" style="padding-top: 0;">
         <div class="well well-sm">
@@ -35,62 +34,86 @@
         </div>
       </div>
     </div>
-
-    <table data-bind="visible: activeImage().breakpoints().length > 0" class="table" style="border-top: 1px solid #ddd;">
-      <thead>
-        <tr>
-          <th>
-            <abbr title="Describes which devices to target by designating if its viewport need to be larger or smaller than a given value. Note: viewport size is a device's width without pixel density!">Viewport size</abbr>
-          </th>
-          <th colspan="3">
-            <abbr title="Describes how large the image will be rendered on the devices display. For responsive purposes this will most likely be a percentage of the display's width, which you can set with the VW unit.">Rendered size</abbr>
-          </th>
-        </tr>
-      </thead>
-      <tbody data-bind="sortable: { data: activeImage().breakpoints, connectClass: 'sort-media', options: { handle: '.sortable-handle' } }">
-        <tr>
-          <td>
-            <div class="input-group input-group-sm">
-              <div class="input-group-btn">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                  <span data-bind="text: verboseType()"></span>&nbsp;<span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-left">
-                  <li>
-                    <a href="#" data-bind="click: function() { type('min-width') }">larger than</a>
-                    <a href="#" data-bind="click: function() { type('max-width') }">smaller than</a>
-                  </li>
-                </ul>
-              </div>
-              <input type="number" class="form-control" data-bind="value: breakWidth">
-              <!-- <span class="input-group-addon">px</span> -->
-            </div>
-          </td>
-          <td>
-            <div class="input-group input-group-sm">
-              <input type="number" class="form-control" data-bind="value: displayWidth">
-              <div class="input-group-btn">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                  <span data-bind="text: unit"></span>&nbsp;<span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-right">
-                  <li>
-                    <a href="#" data-bind="click: function() { unit('vw') }">vw</a>
-                    <a href="#" data-bind="click: function() { unit('px') }">px</a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </td>
-          <td class="sortable-handle" style="vertical-align: middle;">
-            <span class="glyphicon glyphicon-move"></span>
-          </td>
-          <td style="vertical-align: middle;">
-            <button data-bind="click: function() { $root.removeBreakpoint(id) }" type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
   </div>
-  
+  <table class="table" style="border-top: 1px solid #ddd;">
+    <thead>
+      <tr>
+        <th>
+          <abbr title="Describes which devices to target by designating if its viewport need to be larger or smaller than a given value. Note: viewport size is a device's width without pixel density!">Viewport size</abbr>
+        </th>
+        <th colspan="3">
+          <abbr title="Describes how large the image will be rendered on the devices display. For responsive purposes this will most likely be a percentage of the display's width, which you can set with the VW unit.">Rendered size</abbr>
+        </th>
+      </tr>
+    </thead>
+    <tbody data-bind="sortable: { data: breakpoints, connectClass: 'sort-media', options: { handle: '.sortable-handle' } }">
+      <tr>
+        <td>
+          <div class="input-group input-group-sm">
+            <div class="input-group-btn">
+              <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                <span data-bind="text: verboseType()"></span>&nbsp;<span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-left">
+                <li>
+                  <a href="#" data-bind="click: function() { type('min-width') }">larger than</a>
+                  <a href="#" data-bind="click: function() { type('max-width') }">smaller than</a>
+                </li>
+              </ul>
+            </div>
+            <input type="number" class="form-control" data-bind="value: breakWidth">
+            <!-- <span class="input-group-addon">px</span> -->
+          </div>
+        </td>
+        <td>
+          <div class="input-group input-group-sm">
+            <input type="number" class="form-control" data-bind="value: displayWidth">
+            <div class="input-group-btn">
+              <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                <span data-bind="text: unit"></span>&nbsp;<span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-right">
+                <li>
+                  <a href="#" data-bind="click: function() { unit('vw') }">vw</a>
+                  <a href="#" data-bind="click: function() { unit('px') }">px</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </td>
+        <td class="sortable-handle" style="vertical-align: middle;">
+          <span class="glyphicon glyphicon-move"></span>
+        </td>
+        <td style="vertical-align: middle;">
+          <button data-bind="click: function() { $root.removeBreakpoint(id) }" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </td>
+      </tr>
+    </tbody>
+    <tfoot data-bind="with: breakpoint">
+      <tr>
+        <td>
+          <p class="form-control-static">
+            All devices
+          </p>
+        </td>
+        <td>
+          <div class="input-group input-group-sm">
+            <input type="number" class="form-control" data-bind="value: displayWidth">
+            <div class="input-group-btn">
+              <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                <span data-bind="text: unit"></span>&nbsp;<span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-right">
+                <li>
+                  <a href="#" data-bind="click: function() { unit('vw') }">vw</a>
+                  <a href="#" data-bind="click: function() { unit('px') }">px</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </td>
+        <td colspan="2"></td>
+      </tr>
+    </tfoot>
+  </table>
 </div>

@@ -1,8 +1,10 @@
 <h2>Images</h2>
 
-<button data-bind="click: function() { addImage({ editing: 'name' }) }" type="button" class="btn btn-sm btn-success">
+<!-- <button class="btn btn-sm btn-success">
   Add new image&nbsp;&nbsp;<span class="glyphicon glyphicon-plus"></span>
-</button>
+</button> -->
+<button class="btn btn-primary" data-bind="click: function() { console.log(JSON.parse(ko.toJSON(activeImage().sizes()[1], null, 2))) }">Debug active image</button>
+<button class="btn btn-success" data-toggle="modal" data-target="#newImageModal" data-bind="click: function() { editingImage(new Image()) }">Add a new image</button>
 
 <table data-bind="if: images().length > 0" class="table">
   <thead>
@@ -21,10 +23,9 @@
           <input class="form-control" type="text" data-bind="value: name, event: { blur: function() { clearEdit(name) } }">
         </span>
 
-
       </td>
       <td style="text-align: right;">
-        <button data-bind="click: function() { $root.removeImage(id) }" type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <button data-bind="click: function() { $root.removeImage(id) }" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </td>
     </tr>
   </tbody>
