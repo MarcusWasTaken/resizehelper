@@ -1,3 +1,4 @@
+ko.options.deferUpdates = true;
 
 var initialDevices = [
   { name: 'Desktop', width: 1920, density: 1, flagged: true },
@@ -41,13 +42,19 @@ var defaults = {
       name: 'Original',
       width: 1920,
       height: 1080
+    },
+    breakpoint: {
+      name: 'Default',
+      type: 'min-width',
+      breakWidth: 0
     }
   },
   size: {
-    name: 'size',
-    width: 100
+    name: 'Nameless Size',
+    width: 0
   },
   breakpoint: {
+    name: 'Nameless Query',
     type: 'min-width',
     breakWidth: 0,
     displayWidth: 50,
@@ -116,45 +123,33 @@ function Image(options) {
     var outputHtml = '&lt;img ';
     var sizes = self.sizes();
     var breakpoints = self.breakpoints();
-    var name = self.name();
 
-    if (sizes.length > 0) {
-      outputHtml += 'srcset="';
-      for (var key in sizes) {
-        var size = sizes[key];
-        var sizeWidth = size.width();
-        var iteration = parseInt(key) + 1;
-
-        outputHtml += 'http://placehold.it/' + sizeWidth + 'x' + sizeWidth + ' ' + sizeWidth + 'w';
-
-        if (iteration !== sizes.length) {
-          outputHtml += ',&NewLine;' + spaces(13);
-        } else {
-          outputHtml += '"';
-        }
-      }
-      outputHtml += '&NewLine;' + spaces(5);
+    //sizes
+    outputHtml += 'srcset="';
+    for (var key in sizes) {
+      var size = sizes[key];
+      outputHtml += 'http://placehold.it/' + size.width() + 'x' + size.height() + ' ' + size.width() + 'w';
+      outputHtml += ',&NewLine;' + spaces(13);
     }
 
-    if (breakpoints.length > 0) {
-      outputHtml += 'sizes="';
-      for (var key in breakpoints) {
-        var breakpoint = breakpoints[key];
-        var iteration = parseInt(key) + 1;
+    outputHtml += 'http://placehold.it/' + self.size.width() + 'x' + self.size.height() + ' ' + self.size.width() + 'w"';
+    outputHtml += '&NewLine;' + spaces(5);
 
-        outputHtml += '(' + breakpoint.type() + ': ' + breakpoint.breakWidth() + 'px) ' + breakpoint.displayWidth() + breakpoint.unit();
+    //breakpoints
+    outputHtml += 'sizes="';
 
-        if (iteration !== breakpoints.length) {
-          outputHtml += ',&NewLine;' + spaces(12);
-        } else {
-          outputHtml += '"';
-        }
-      }
-      outputHtml += '&NewLine;' + spaces(5);
+    for (var key in breakpoints) {
+      var breakpoint = breakpoints[key];
+
+      outputHtml += '(' + breakpoint.type() + ': ' + breakpoint.breakWidth() + 'px) ' + breakpoint.displayWidth() + breakpoint.unit();
+      outputHtml += ',&NewLine;' + spaces(12);
     }
 
-    outputHtml += 'alt="' + name + '" /&gt;';
+    outputHtml += self.breakpoint.displayWidth() + self.breakpoint.unit() + '"';
+    outputHtml += '&NewLine;' + spaces(5);
 
+    outputHtml += 'alt="' + self.name() + '" /&gt;';
+    
     return outputHtml;
   });
 
@@ -198,7 +193,9 @@ function Size(options) {
     });
   } else {
     self.height = ko.computed(function() {
-      return Math.ceil(self.width() * viewmodel.activeImage().size.ratio());
+      if(!$.isEmptyObject(viewmodel.activeImage())) {
+        return Math.ceil(self.width() * viewmodel.activeImage().size.ratio());
+      }
     });
   }
 
@@ -219,15 +216,13 @@ function Breakpoint(options) {
   var set = $.extend({}, defaults.breakpoint, options);
 
   self.id = set.id;
+  self.name = ko.observable(set.name);
   self.type = ko.observable(set.type);
+  self.types = [ { name: 'min-width', val: 'min-width' }, { name: 'max-width', val: 'max-width' } ];
   self.breakWidth = ko.observable(set.breakWidth);
   self.displayWidth = ko.observable(set.displayWidth);
   self.unit = ko.observable(set.unit);
-
-  self.verboseType = function() {
-    if(self.type() === 'min-width') { return 'larger than'; }
-    if(self.type() === 'max-width') { return 'smaller than'; }
-  };
+  self.units = [ 'px', 'vw' ];
 
   // Test will check if the parameter displayWidth fits inside the breakpoint,
   // so if the breakpoint is 'min-width': 1600 px, then the displayWidth needs
@@ -266,47 +261,68 @@ function Device(options) {
     }
   };
 
-  self.loss = ko.computed(function () {
-    var loss;
-    var sizeFound = false;
+  self.loss = ko.computed( function() {
+    if($.isEmptyObject(viewmodel.activeImage())) {
+      self.usingSize('-');
+      return 'undefined';
+    }
 
-    if(!$.isEmptyObject(viewmodel.activeImage()) && viewmodel.activeImage().sizes().length > 0) { // <-- check if there are sizes to calculate with
-      var displayWidth = false;
-      var sizes = viewmodel.activeImage().sizes();
-      var breakpoints = viewmodel.activeImage().breakpoints();
+    var returnedLoss;
+    var sizes = [].concat(viewmodel.activeImage().sizes()).concat(viewmodel.activeImage().size);
+    var breakpoints = [].concat(viewmodel.activeImage().breakpoints()).concat(viewmodel.activeImage().breakpoint);
 
-      for (var key1 in sizes) {
-        var size = sizes[key1];
+    for (var key1 in sizes) {
+      var size = sizes[key1];
+      var breakpointTest = false;
 
-        for (var key2 in breakpoints) {
-          var breakpoint = breakpoints[key2];
-          var breakpointTest = breakpoint.test(self.width);
-          if (breakpointTest) {
-            displayWidth = breakpointTest;
-            break;
-          }
+      if(size.width() < 1) {
+        continue;
+      }
+
+      for (var key2 in breakpoints) {
+        var breakpoint = breakpoints[key2];
+        breakpointTest = breakpoint.test(self.width);
+        if (breakpointTest) {
+          break;
         }
+      }
 
-        if (displayWidth) {
-          var displayHeight = displayWidth * viewmodel.activeImage().size.ratio();
-
-          var deviceLoss = size.width() * size.height() - (self.density * displayWidth) * (self.density * displayHeight);
-          var lossInKb = deviceLoss * 4 / 1024;
-
-          if (deviceLoss >= 0 && (deviceLoss < loss || typeof loss === 'undefined')) {
-            loss = lossInKb;
-            self.usingSize(size.width());
-            sizeFound = true;
-          }
+      if (breakpointTest) {
+        var renderWidth = breakpointTest;
+        var renderHeight = breakpointTest * viewmodel.activeImage().size.ratio();
+        var loss = size.width() * size.height() - (self.density * renderWidth) * (self.density * renderHeight);
+        
+        if (loss >= 0 && (loss < returnedLoss || typeof returnedLoss === 'undefined')) {
+          self.usingSize(size.width());
+          returnedLoss = loss;
+        } else if ((returnedLoss < 0 || typeof returnedLoss === 'undefined') && (loss > returnedLoss || typeof returnedLoss === 'undefined')) {
+          self.usingSize(size.width());
+          returnedLoss = loss;
         }
       }
     }
 
-    if (!sizeFound) {
+    if (typeof returnedLoss === 'undefined') {
       self.usingSize('-');
-      return '-';
+      return 'undefined';
     } else {
-      return loss != 0 ? Math.round((loss + 0.00001) / 1024 * 10 ) / 10 + ' MB' : loss}
+      return returnedLoss;
+    }
+  });
+
+  self.lossOutput = ko.computed( function() {
+    var loss = self.loss();
+
+    if (loss === 0) {
+      return loss + ' KB';
+    } else if (loss > 0) {
+      return Math.round(loss * 4 / 1024 + 0.00001) + ' KB';
+      //return Math.round((loss * 4 / 1024 + 0.00001) / 1024 * 10) / 10 + ' MB';
+    } else if (loss < 0) {
+      return 'Upscaled';
+    } else {
+      return '-';
+    }
   });
 }
 
@@ -343,15 +359,16 @@ function DevicesViewModel() {
     if(image.active()) { return; }
 
     // remove active from the already active image
-    if(!$.isEmptyObject(self.activeImage()) && self.activeImage().active) {
-      self.activeImage().active(false);
-    }
+    self.clearActiveImage();
 
     // set the new item as active
     image.active(true);
     self.activeImage(image);
   };
   self.clearActiveImage = function() {
+    if(!$.isEmptyObject(self.activeImage()) && self.activeImage().active) {
+      self.activeImage().active(false);
+    }
     self.activeImage(undefined);
   };
   self.addSize = function(options) {
@@ -387,12 +404,6 @@ function DevicesViewModel() {
   self.removeDevice = function(id) {
 
   };
-
-  self.updateOuput = ko.computed(function() {
-    if(!$.isEmptyObject(self.activeImage())) {
-      $('#js-output').html(self.activeImage().output());
-    }
-  });
 }
 
 var viewmodel = new DevicesViewModel();
@@ -426,44 +437,52 @@ ko.bindingHandlers.selected = {
 
 ko.applyBindings(viewmodel);
 
-
-function panelToggle(el, val) {
-  var $this = $(el);
-  var $target = $($this.data('target'));
-  var isActive = $this.hasClass('active');
-  //var targetArr = $this.data('target').replace('#', '');
-
-  console.log($(el));
-  console.log(val);
-
-  if (isActive) {
-
-  } else {
-
-  }
-
-}
-
-$('[data-toggle="visibility"]').on('click', function() {
-  var $this = $(this);
-  var $target = $($this.data('target'));
-  var $parent = $($this.data('parent'));
-  var isActive = $this.hasClass('active');
-
-  if($parent.exists()) {
-    $parent.find('.collapse.in').removeClass('in');
-    $parent.find('[data-toggle="visibility"].active').removeClass('active');
-  }
-
-  if(isActive) {
-    $this.removeClass('active');
-    $target.removeClass('in');
-  } else {
-    $this.addClass('active');
-    $target.addClass('in');
-  }
-
+$('.panel-content').on('click', '.component-header', function() {
+  $(this).parent().toggleClass('active');
 });
+
+$('.col-top').on('click', '.panel-handle', function() {
+  $(this).parent().siblings('.panel.active').removeClass('active');
+  $(this).parent().addClass('active');
+});
+
+$('.modal').on('click', '.modal-bg', function() {
+  $(this).parent().removeClass('open');
+});
+
+$('.modal-trigger').on('click', function() {
+  var target = $(this).data('target');
+
+  $(target).addClass('open');
+});
+
+/*
+$('.col-top').sortable({
+  connectWith: '.col-top',
+  handle: '.panel-handle',
+  distance: 32,
+  scroll: false,
+  tolerance: 'pointer',
+  containment: 'window'
+});
+
+$('.col-top').on('sortstart', function(event, ui) {
+  $(this).find('.panel:not(.active)').first().addClass('active');
+})
+
+$('.col-top').on('sortstop', function(event, ui) {
+  if($(this).find(ui.item).length) {
+    $(this).find('.panel.active').removeClass('active');
+    ui.item.addClass('active');
+  }
+})
+
+$('.col-top').on('sortreceive', function(event, ui) {
+  $(this).find('.panel.active').removeClass('active');
+  ui.item.addClass('active');
+})*/
+
+//$('[selectmenu="true"]').selectmenu();
 
 
 

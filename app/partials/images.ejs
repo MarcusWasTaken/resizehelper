@@ -1,32 +1,30 @@
-<h2>Images</h2>
+<div class="panel active">
+  <div class="panel-handle">
+    <span>Images</span>
+  </div>
+  <div class="panel-content">
 
-<!-- <button class="btn btn-sm btn-success">
-  Add new image&nbsp;&nbsp;<span class="glyphicon glyphicon-plus"></span>
-</button> -->
-<button class="btn btn-primary" data-bind="click: function() { console.log(JSON.parse(ko.toJSON(activeImage().sizes()[1], null, 2))) }">Debug active image</button>
-<button class="btn btn-success" data-toggle="modal" data-target="#newImageModal" data-bind="click: function() { editingImage(new Image()) }">Add a new image</button>
+    <div class="panel-header">
+      <div class="buttonbar">
+        <a class="button" data-toggle="modal" data-target="#newImageModal" data-bind="click: function() { editingImage(new Image()) }">Create</a>
+        <a class="button" data-bind="click: function() { console.log(JSON.parse(ko.toJSON(activeImage().sizes()[1], null, 2))) }">Debug</a>
+        <a class="button modal-trigger" data-target="#newImageModal">Foo</a>
+      </div>
+    </div>
 
-<table data-bind="if: images().length > 0" class="table">
-  <thead>
-    <tr>
-      <th colspan="2">Name</th>
-    </tr>
-  </thead>
-  <tbody data-bind="foreach: images">
-    <tr data-bind="click: function() { $root.setActiveImage(id) }, css: { active: active() }" style="cursor: pointer;">
-      <td style="vertical-align: middle;">
-        
-        <span data-bind="visible: !isEditing(name)">
-          <span data-bind="text: name, click: function() { editing(name) }"></span>
-        </span>
-        <span data-bind="visibleAndSelect: isEditing(name)">
-          <input class="form-control" type="text" data-bind="value: name, event: { blur: function() { clearEdit(name) } }">
-        </span>
+    <ul class="imagesList" data-bind="foreach: images, click: function() { $root.clearActiveImage() }">
+      <li data-bind="click: function() { $root.setActiveImage(id) }, clickBubble: false, css: { active: active() }">
+        <div class="imagesList-name">
+          <span data-bind="visible: !isEditing(name)">
+            <span data-bind="text: name, click: function() { editing(name) }"></span>
+          </span>
+          <span data-bind="visibleAndSelect: isEditing(name)">
+            <input class="form-control" type="text" data-bind="value: name, event: { blur: function() { clearEdit(name) } }">
+          </span>
+        </div>
+        <a class="imagesList-remove" data-bind="click: function() { $root.removeImage(id) }">&times;</a>
+      </li>
+    </ul>
 
-      </td>
-      <td style="text-align: right;">
-        <button data-bind="click: function() { $root.removeImage(id) }" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-      </td>
-    </tr>
-  </tbody>
-</table>
+  </div>
+</div>

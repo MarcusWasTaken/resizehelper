@@ -1,10 +1,116 @@
-<div class="panel panel-primary" data-bind="with: activeImage">
-  <div class="panel-heading panel-toggle" data-bind="click: " data-target="#size">
-    <h4 class="panel-title">Sizes</h4>
-    <span class="glyphicon glyphicon-chevron-down"></span>
+<div class="component active" data-bind="with: activeImage">
+  <div class="component-header">
+    Sizes
   </div>
 
-  <div class="collapse" id="size">
+  <div class="component-body">
+    <div class="buttonbar">
+      <a class="button" data-bind="click: function() { $root.addSize() }">New</a>
+    </div>
+
+    <ul class="sizesList">
+      <li data-bind="with: size">
+        <h6 data-bind="text: name"></h6>
+        <div class="inputContainer">
+          <div class="inputGroup">
+            <label for="">Width</label>
+            <input type="number" data-bind="value: width">
+          </div>
+          <div class="inputGroup">
+            <label for="">Height</label>
+            <input type="number" data-bind="value: height">
+          </div>
+        </div>
+      </li>
+      <!-- ko foreach: sizes -->
+        <li>
+          <h6>
+            <!-- ko text: name --><!-- /ko -->
+            <span class="remove" data-bind="click: function() { $root.removeSize(id) }">&times;</span>
+          </h6>
+          <div class="inputContainer">
+            <div class="inputGroup">
+              <label for="">Width</label>
+              <input type="number" data-bind="value: width">
+            </div>
+            <div class="inputGroup">
+              <label for="">Height</label>
+              <input type="number" data-bind="value: height" disabled="disabled">
+            </div>
+          </div>
+        </li>
+      <!-- /ko -->
+    </ul>
+
+    <table class="table">
+      <!-- <thead>
+        <tr>
+          <th>Name</th>
+          <th>Width</th>
+          <th>Height</th>
+          <th width="50px;"></th>
+        </tr>
+      </thead>
+      <tbody data-bind="sortable: { data: sizes, connectClass: 'sort-sizes', options: { handle: '.sortable-handle' } }">
+        <tr>
+          <td>
+            <div data-bind="visible: !$parent.isEditing($parent.sizes)">
+              <p class="form-control-static" data-bind="text: name"></p>
+            </div>
+            <div data-bind="visible: $parent.isEditing($parent.sizes)">
+              <input class="form-control" type="text" data-bind="value: name">
+            </div>
+          </td>
+          <td>
+            <div data-bind="visible: !$parent.isEditing($parent.sizes)">
+              <p class="form-control-static" data-bind="text: width"></p>
+            </div>
+            <div data-bind="visible: $parent.isEditing($parent.sizes)">
+              <input class="form-control" type="number" data-bind="value: width">
+            </div>
+          </td>
+          <td>
+            <div data-bind="visible: !$parent.isEditing($parent.sizes)">
+              <p class="form-control-static" data-bind="text: height"></p>
+            </div>
+            <div data-bind="visible: $parent.isEditing($parent.sizes)">
+              <input class="form-control" type="number" data-bind="value: height" disabled>
+            </div>
+          </td>
+          <td style="text-align: right; vertical-align: middle;">
+            <div data-bind="visible: $parent.isEditing($parent.sizes)">
+              <span class="sortable-handle form-control-static">
+                <span class="glyphicon glyphicon-move"></span>
+              </span>
+              <span class="form-control-static" data-bind="click: function() { $root.removeSize(id) }">
+                <span class="glyphicon glyphicon-remove"></span>
+              </span>
+            </div>
+          </td>
+        </tr>
+      </tbody> -->
+      <!-- <tfoot data-bind="with: size">
+        <tr>
+          <td>
+            <p class="form-control-static" data-bind="text: name"></p>
+          </td>
+          <td>
+            <p class="form-control-static" data-bind="text: width"></p>
+          </td>
+          <td>
+            <p class="form-control-static" data-bind="text: height"></p>
+          </td>
+          <td colspan="2"></td>
+        </tr>
+      </tfoot> -->
+    </table>
+
+  </div>
+
+</div>
+
+
+<!-- <div class="collapse" id="size">
     <div class="panel-body">
       <div class="btn-flexgroup btn-group-sm">
         <a class="btn btn-default" data-toggle="visibility" data-target="#sizeDesc" data-parent="#size">
@@ -34,67 +140,4 @@
         </div>
       </div>
     </div>
-  </div>
-  <table class="table" style="border-top: 1px solid #ddd;">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Width</th>
-        <th>Height</th>
-        <th width="50px;"></th>
-      </tr>
-    </thead>
-    <tbody data-bind="sortable: { data: sizes, connectClass: 'sort-sizes', options: { handle: '.sortable-handle' } }">
-      <tr>
-        <td>
-          <div data-bind="visible: !$parent.isEditing($parent.sizes)">
-            <p class="form-control-static" data-bind="text: name"></p>
-          </div>
-          <div data-bind="visible: $parent.isEditing($parent.sizes)">
-            <input class="form-control" type="text" data-bind="value: name">
-          </div>
-        </td>
-        <td>
-          <div data-bind="visible: !$parent.isEditing($parent.sizes)">
-            <p class="form-control-static" data-bind="text: width"></p>
-          </div>
-          <div data-bind="visible: $parent.isEditing($parent.sizes)">
-            <input class="form-control" type="number" data-bind="value: width">
-          </div>
-        </td>
-        <td>
-          <div data-bind="visible: !$parent.isEditing($parent.sizes)">
-            <p class="form-control-static" data-bind="text: height"></p>
-          </div>
-          <div data-bind="visible: $parent.isEditing($parent.sizes)">
-            <input class="form-control" type="number" data-bind="value: height" disabled>
-          </div>
-        </td>
-        <td style="text-align: right; vertical-align: middle;">
-          <div data-bind="visible: $parent.isEditing($parent.sizes)">
-            <span class="sortable-handle form-control-static">
-              <span class="glyphicon glyphicon-move"></span>
-            </span>
-            <span class="form-control-static" data-bind="click: function() { $root.removeSize(id) }">
-              <span class="glyphicon glyphicon-remove"></span>
-            </span>
-          </div>
-        </td>
-      </tr>
-    </tbody>
-    <tfoot data-bind="with: size">
-      <tr>
-        <td>
-          <p class="form-control-static" data-bind="text: name"></p>
-        </td>
-        <td>
-          <p class="form-control-static" data-bind="text: width"></p>
-        </td>
-        <td>
-          <p class="form-control-static" data-bind="text: height"></p>
-        </td>
-        <td colspan="2"></td>
-      </tr>
-    </tfoot>
-  </table>
-</div>
+  </div> -->
