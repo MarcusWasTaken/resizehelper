@@ -1,0 +1,23 @@
+@mixin ulClean {
+  margin: 0;
+  padding: 0;
+  li {
+    list-style-type: none;
+  }
+}
+
+@mixin clearfix {
+  &:before,
+  &:after {
+    content: " "; // 1
+    display: table; // 2
+  }
+  &:after {
+    clear: both;
+  }
+}
+
+@function w($cols) {
+  $totalCols: 12;
+  @return 100/($totalCols/$cols) * 1%;
+}

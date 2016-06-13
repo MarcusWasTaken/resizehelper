@@ -1,47 +1,27 @@
-$icon-font-path: '../fonts/';
-//$zindex-modal: 
-
 // bower:scss
-//@import "bower_components/bootstrap-sass/assets/stylesheets/_bootstrap.scss";
-@import "bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_variables.scss";
-@import "bower_components/bootstrap-sass/assets/stylesheets/bootstrap/mixins/_vendor-prefixes.scss";
-@import "bower_components/bootstrap-sass/assets/stylesheets/bootstrap/mixins/_opacity.scss";
-@import "bower_components/bootstrap-sass/assets/stylesheets/bootstrap/mixins/_clearfix.scss";
-@import "bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_normalize.scss";
-@import "bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_modals.scss";
+@import "/bower_components/normalize-css/normalize.css";
 // endbower
 
-@mixin ulClean {
-  margin: 0;
-  padding: 0;
-  li {
-    list-style-type: none;
-  }
-}
-
-@mixin clearfix {
-  &:before,
-  &:after {
-    content: " "; // 1
-    display: table; // 2
-  }
-  &:after {
-    clear: both;
-  }
-}
-
-@function w($cols) {
-  //mixin for generating a percentage based grid width.
-  $totalCols: 12;
-  @return 100/($totalCols/$cols) * 1%;
-}
+@import "variables.scss";
+@import "mixins.scss";
 
 *, *:before, *:after {
   box-sizing: border-box;
 }
 
+input,
+button,
+select,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+
 body {
-  background-color: #383838;
+  background-color: $bodyBackground;
+  font-family: 'Open Sans', sans-serif;
 }
 
 .sortable-handle {
@@ -49,7 +29,9 @@ body {
 }
 
 .table {
+  width: 100%;
   tr {
+    text-align: left;
     &.ui-sortable-helper {
       background-color: white;
     }
@@ -88,7 +70,6 @@ body {
   }
 }
 
-
 [title] {
   cursor: help;
 }
@@ -106,8 +87,7 @@ body {
 
   &-inner {
     @include clearfix;
-    border: 4px solid #383838;
-    //background-color: lightgrey;
+    border: 4px solid $bodyBackground;
     padding-left: 3px;
     width: 100%;
     height: 100%;
@@ -124,28 +104,19 @@ body {
 .layout1 {
   > .col {
     &:nth-child(1) {
-      width: w(5);
+      width: w(3);
     }
     &:nth-child(2) {
-      width: w(3);
-
-      .col-inner {
-        &:nth-child(1) {
-          height: 60%;
-        }
-        &:nth-child(2) {
-          height: 40%;
-        }
-      }
+      width: w(4.5);
     }
     &:nth-child(3) {
-      width: w(4);
+      width: w(4.5);
     }
   }
 }
 
 .panel {
-  color: #bababa;
+  color: $fontColor;
 
   &-handle {
     display: inline-block;
@@ -157,13 +128,13 @@ body {
 
     > span {
       display: inline-block;
-      background-color: #484848;
+      background-color: $panelBackground;
       font-size: 14px;
       height: 24px;
       line-height: 24px;
       padding-left: 8px;
       padding-right: 40px;
-      border-top: 1px solid #2b2b2b;
+      border-top: 1px solid $panelBorderColor;
     }
 
     &:before, &:after {
@@ -191,15 +162,15 @@ body {
     right: 0;
     bottom: 0;
     left: 0;
-    border: 1px solid #2b2b2b;
-    background-color: #484848;
+    border: 1px solid $panelBorderColor;
+    background-color: $panelBackground;
     overflow: auto;
   }
 
   &-header {
     padding-top: 4px;
-    border-bottom: 1px solid #2b2b2b;
-    background-color: #515151;
+    border-bottom: 1px solid $panelBorderColor;
+    background-color: $panelHighlight;
   }
 
   &.active {
@@ -208,7 +179,7 @@ body {
       z-index: 3;
 
       > span {
-        background-color: #515151;
+        background-color: $panelHighlight;
       }
 
       &:before, &:after {
@@ -220,10 +191,6 @@ body {
       display: block;
     }
   }
-}
-
-.table {
-  width: 100%;
 }
 
 .component {
@@ -272,33 +239,28 @@ body {
   @include clearfix;
   height: 24px;
   line-height: 24px;
-  border-top: 1px solid #2b2b2b;
-  border-bottom: 1px solid #2b2b2b;
+  border-top: 1px solid $panelBorderColor;
+  border-bottom: 1px solid $panelBorderColor;
   background: url('../images/btnbackdrop1.png');
   padding: 0 8px;
   box-sizing: content-box;
   
   .button {
-    cursor: pointer;
-    border-left: 1px solid #2b2b2b;
+    border: 0;
+    background: transparent;
+    border-left: 1px solid $panelBorderColor;
     float: left;
     padding: 0 8px;
-    user-select: none;
+    line-height: 24px;
 
     &:hover {
       background: url('../images/btnhighlight1.png');
-      color: white;
     }
 
     &:last-child {
-      border-right: 1px solid #2b2b2b;
+      border-right: 1px solid $panelBorderColor;
     }
   }
-}
-
-tr.active {
-  background-color: #515151;
-  color: white;
 }
 
 .imagesList {
@@ -325,7 +287,7 @@ tr.active {
     line-height: 24px;
 
     &.active {
-      background-color: #515151;
+      background-color: $panelHighlight;
       color: white;
     }
   }
@@ -359,7 +321,6 @@ tr.active {
 
   li {
     margin-bottom: 4px;
-    background-color: #484848;
   }
 
   .ui-sortable-helper .sort-handle {
@@ -382,10 +343,20 @@ tr.active {
     label {
       padding-right: 8px;
       font-size: 14px;
+      min-width: 70px;
+      text-align: right;
     }
 
     input {
       width: 100%;
+
+      + select {
+        margin-left: -1px;
+      }
+    }
+
+    select + input {
+      border-left: 0;
     }
   }
 }
@@ -411,15 +382,15 @@ tr.active {
       margin: 0;
       font-size: 14px;
       font-style: italic;
-      color: darken(#bababa, 15%);
+      color: darken($fontColor, 15%);
       cursor: default;
     }
 
-    label {
+    /* label {
       min-width: 70px;
-    }
+    } */
 
-    &:nth-child(1) {
+    /* &:nth-child(1) {
       input {
         border-left: 0;
       }
@@ -429,7 +400,7 @@ tr.active {
       input {
         border-right: 0;
       }
-    }
+    } */
   }
 }
 
@@ -450,8 +421,9 @@ h6 {
 }
 
 input {
-  background: #515151;
-  border: 1px inset #383838;
+  background: mix(black, $panelBackground, 5%);
+  /* background: $panelHighlight; */
+  border: 1px inset $panelBorderColor;
   outline: 0;
   padding: 0 4px;
   height: 24px;
@@ -464,13 +436,13 @@ input {
 
   &:disabled {
     font-style: italic;
-    color: darken(#bababa, 15%);
+    color: darken($fontColor, 15%);
   }
 }
 
 select {
-  background: #515151;
-  border: 1px solid #2b2b2b;
+  background: $panelHighlight;
+  border: 1px solid $panelBorderColor;
   outline: 0;
   padding: 0 4px;
   height: 24px;
@@ -483,12 +455,8 @@ select {
 
   &:disabled {
     font-style: italic;
-    color: darken(#bababa, 15%);
+    color: darken($fontColor, 15%);
   }
-}
-
-tr {
-  text-align: left;
 }
 
 .modal {
@@ -503,10 +471,6 @@ tr {
     display: none;
   }
 
-  &.open {
-    display: block !important;
-  }
-
   &-bg {
     position: absolute;
     top: 0;
@@ -518,12 +482,61 @@ tr {
 
   &-dialog {
     width: 600px;
-    height: 400px;
     z-index: 2;
     position: relative;
-    background-color: #484848;
-    color: #bababa;
-    border: 1px solid #2b2b2b;
+    background-color: $panelBackground;
+    color: $fontColor;
+    border: 1px solid $panelBorderColor;
     padding: 4px 16px;
+    margin: 50px auto;
+  }
+}
+
+.newImageForm {
+  @include clearfix;
+  margin: 8px 0;
+
+  .inputGroup {
+    display: flex;
+    margin-bottom: 8px;
+
+    label {
+      width: 70px;
+      padding-right: 8px;
+      font-size: 14px;
+      height: 24px;
+      line-height: 24px;
+    }
+    input {
+      flex: 2;
+    }
+  }
+  
+  .buttonsContainer {
+    margin-top: 8px;
+    float: right;
+  }
+}
+
+.button {
+  display: inline-block;
+  cursor: pointer;
+  border: 1px outset $panelBorderColor;
+  padding: 0 16px;
+  user-select: none;
+  background: $panelBackground;
+  height: 24px;
+  line-height: 22px;
+  font-size: 14px;
+  outline: 0;
+
+  &:hover {
+    background: $panelHighlight;
+    color: white;
+  }
+
+  &:active {
+    background: mix(black, $panelBackground, 10%);
+    border-style: inset;
   }
 }

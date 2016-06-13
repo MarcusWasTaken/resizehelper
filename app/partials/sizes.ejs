@@ -1,4 +1,4 @@
-<div class="component active" data-bind="with: activeImage">
+<div class="component active">
   <div class="component-header">
     Sizes
   </div>
@@ -7,10 +7,13 @@
     <div class="buttonbar">
       <a class="button" data-bind="click: function() { $root.addSize() }">New</a>
     </div>
-
-    <ul class="sizesList">
-      <li data-bind="with: size">
-        <h6 data-bind="text: name"></h6>
+    
+    <ul class="sizesList" data-bind="foreach: sizes">
+      <li>
+        <h6>
+          <!-- ko text: name --><!-- /ko -->
+          <span class="remove" data-bind="click: function() { $root.removeSize(id) }">&times;</span>
+        </h6>
         <div class="inputContainer">
           <div class="inputGroup">
             <label for="">Width</label>
@@ -18,28 +21,10 @@
           </div>
           <div class="inputGroup">
             <label for="">Height</label>
-            <input type="number" data-bind="value: height">
+            <input type="number" data-bind="value: height" disabled="disabled">
           </div>
         </div>
       </li>
-      <!-- ko foreach: sizes -->
-        <li>
-          <h6>
-            <!-- ko text: name --><!-- /ko -->
-            <span class="remove" data-bind="click: function() { $root.removeSize(id) }">&times;</span>
-          </h6>
-          <div class="inputContainer">
-            <div class="inputGroup">
-              <label for="">Width</label>
-              <input type="number" data-bind="value: width">
-            </div>
-            <div class="inputGroup">
-              <label for="">Height</label>
-              <input type="number" data-bind="value: height" disabled="disabled">
-            </div>
-          </div>
-        </li>
-      <!-- /ko -->
     </ul>
 
     <table class="table">

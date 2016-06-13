@@ -1,4 +1,4 @@
-<div class="component active" data-bind="with: activeImage">
+<div class="component active">
   <div class="component-header">
     Media Queries
   </div>
@@ -30,22 +30,7 @@
           </div>
         </li>
     </ul>
-    <ul class="mediaList" data-bind="with: breakpoint">
-      <li>
-        <h6 data-bind="text: name"></h6>
-        <div class="inputContainer">
-          <div class="inputGroup">
-            <label>Viewport</label>
-            <p>All</p>
-          </div>
-          <div class="inputGroup">
-            <label>Display</label>
-            <input type="number" data-bind="value: displayWidth">
-            <select data-bind="options: units, value: unit"></select>
-          </div>
-        </div>
-      </li>
-    </ul>
+    
     
     <%#
     <table class="table">

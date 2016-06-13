@@ -1,0 +1,44 @@
+<div class="panel active" data-bind="visible: !$.isEmptyObject(activeImage())">
+  <div class="panel-handle">
+    <span>Properties</span>
+  </div>
+  <div class="panel-content" data-bind="with: activeImage">
+    <div class="panel-header">
+      <ul class="sizesList">
+        <li data-bind="with: size">
+          <div class="inputContainer">
+            <div class="inputGroup">
+              <label for="">Width</label>
+              <input type="number" data-bind="value: width">
+            </div>
+            <div class="inputGroup">
+              <label for="">Height</label>
+              <input type="number" data-bind="value: height">
+            </div>
+          </div>
+        </li>
+      </ul>
+
+      <ul class="mediaList" data-bind="with: breakpoint">
+        <li>
+          <div class="inputContainer">
+            <div class="inputGroup" style="display: none;">
+              <label>Viewport</label>
+              <p>All</p>
+            </div>
+            <div class="inputGroup">
+              <label>Render</label>
+              <input type="number" data-bind="value: displayWidth">
+              <select data-bind="options: units, value: unit"></select>
+            </div>
+          </div>
+        </li>
+      </ul>
+
+    </div>
+
+    <% include media.ejs %>
+    <% include sizes.ejs %>
+    
+  </div>
+</div>

@@ -447,10 +447,15 @@ $('.col-top').on('click', '.panel-handle', function() {
 });
 
 $('.modal').on('click', '.modal-bg', function() {
-  $(this).parent().removeClass('open');
+  $(this).closest('.modal').removeClass('open');
 });
 
-$('.modal-trigger').on('click', function() {
+$('.modal').on('click', '[data-dismiss="modal"]', function() {
+  $(this).closest('.modal').removeClass('open');
+
+});
+
+$('[data-toggle="modal"]').on('click', function() {
   var target = $(this).data('target');
 
   $(target).addClass('open');
