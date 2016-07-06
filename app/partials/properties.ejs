@@ -4,32 +4,31 @@
   </div>
   <div class="panel-content" data-bind="with: activeImage">
     <div class="panel-header">
-      <ul class="sizesList">
-        <li data-bind="with: size">
+
+      <ul class="formList">
+        <li>
           <div class="inputContainer">
             <div class="inputGroup">
-              <label for="">Width</label>
-              <input type="number" data-bind="value: width">
+              <label>Name</label>
+              <input type="text" data-bind="value: name">
             </div>
-            <div class="inputGroup">
-              <label for="">Height</label>
-              <input type="number" data-bind="value: height">
+            <div class="inputGroup" data-bind="with: breakpoint">
+              <label>Render</label>
+              <input type="number" min="0" data-bind="value: displayWidth">
+              <select data-bind="options: units, value: unit"></select>
             </div>
           </div>
         </li>
-      </ul>
 
-      <ul class="mediaList" data-bind="with: breakpoint">
-        <li>
+        <li data-bind="with: size">
           <div class="inputContainer">
-            <div class="inputGroup" style="display: none;">
-              <label>Viewport</label>
-              <p>All</p>
+            <div class="inputGroup">
+              <label>Width</label>
+              <input type="number" min="0" data-bind="value: width">
             </div>
             <div class="inputGroup">
-              <label>Render</label>
-              <input type="number" data-bind="value: displayWidth">
-              <select data-bind="options: units, value: unit"></select>
+              <label>Height</label>
+              <input type="number" min="0" data-bind="value: height">
             </div>
           </div>
         </li>

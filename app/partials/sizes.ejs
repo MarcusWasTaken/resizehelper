@@ -1,14 +1,11 @@
-<div class="component active">
-  <div class="component-header">
-    Sizes
-  </div>
-
+<div class="component">
+  <h4 class="component-header">Sizes</h4>
   <div class="component-body">
     <div class="buttonbar">
       <a class="button" data-bind="click: function() { $root.addSize() }">New</a>
     </div>
     
-    <ul class="sizesList" data-bind="foreach: sizes">
+    <ul class="formList" data-bind="foreach: sizes">
       <li>
         <h6>
           <!-- ko text: name --><!-- /ko -->
@@ -16,19 +13,19 @@
         </h6>
         <div class="inputContainer">
           <div class="inputGroup">
-            <label for="">Width</label>
-            <input type="number" data-bind="value: width">
+            <label>Width</label>
+            <input type="number" min="0" data-bind="value: width">
           </div>
           <div class="inputGroup">
-            <label for="">Height</label>
+            <label>Height</label>
             <input type="number" data-bind="value: height" disabled="disabled">
           </div>
         </div>
       </li>
     </ul>
-
+    <!-- 
     <table class="table">
-      <!-- <thead>
+      <thead>
         <tr>
           <th>Name</th>
           <th>Width</th>
@@ -87,8 +84,9 @@
           </td>
           <td colspan="2"></td>
         </tr>
-      </tfoot> -->
+      </tfoot> 
     </table>
+    -->
 
   </div>
 

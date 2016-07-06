@@ -46,7 +46,8 @@ var defaults = {
     breakpoint: {
       name: 'Default',
       type: 'min-width',
-      breakWidth: 0
+      breakWidth: 0,
+      unit: 'px'
     }
   },
   size: {
@@ -338,7 +339,12 @@ function DevicesViewModel() {
 
   self.addImage = function(options) {
     var newId = genUniqueProperty(self.images(), 'id');
-    options = $.extend({}, options, { id: newId });
+    options = $.extend({}, defaults.image, options, { 
+      id: newId
+    });
+    $.extend(options.breakpoint, {
+      displayWidth: options.size.width
+    });
     self.images.push(new Image(options));
 
     self.setActiveImage(newId);

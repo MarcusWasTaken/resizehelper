@@ -1,34 +1,30 @@
-<div class="component active">
-  <div class="component-header">
-    Media Queries
-  </div>
-
+<div class="component">
+  <h4 class="component-header">Media Queries</h4>
   <div class="component-body">
     <div class="buttonbar">
       <a class="button" data-bind="click: function() { $root.addBreakpoint() }">New</a>
-      <%# <a class="button" data-bind="click: function() { console.log(JSON.parse(ko.toJSON(breakpoint, null, 2))) }">Debug</a> %>
     </div>
 
-    <ul class="mediaList" data-bind="sortable: { data: breakpoints, options: { handle: '.sort-handle', containment: 'parent', tolerance: 'pointer' } }">
-        <li>
-          <h6>
-            <!-- ko text: name --><!-- /ko -->
-            <span class="remove" data-bind="click: function() { $root.removeBreakpoint(id) }">&times;</span>
-            <span class="sort-handle"></span>
-          </h6>
-          <div class="inputContainer">
-            <div class="inputGroup">
-              <label>Viewport</label>
-              <select data-bind="options: types, optionsText: 'name', optionsValue: 'val', value: type"></select>
-              <input type="number" data-bind="value: breakWidth">
-            </div>
-            <div class="inputGroup">
-              <label>Display</label>
-              <input type="number" data-bind="value: displayWidth">
-              <select data-bind="options: units, value: unit"></select>
-            </div>
+    <ul class="formList mediaList" data-bind="sortable: { data: breakpoints, options: { handle: '.sort-handle', containment: 'parent', tolerance: 'pointer' } }">
+      <li>
+        <h6>
+          <!-- ko text: name --><!-- /ko -->
+          <span class="remove" data-bind="click: function() { $root.removeBreakpoint(id) }">&times;</span>
+          <span class="sort-handle"></span>
+        </h6>
+        <div class="inputContainer">
+          <div class="inputGroup">
+            <label>Condition</label>
+            <select data-bind="options: types, optionsText: 'name', optionsValue: 'val', value: type"></select>
+            <input type="number" min="0" data-bind="value: breakWidth">
           </div>
-        </li>
+          <div class="inputGroup">
+            <label>Render</label>
+            <input type="number" min="0" data-bind="value: displayWidth">
+            <select data-bind="options: units, value: unit"></select>
+          </div>
+        </div>
+      </li>
     </ul>
     
     

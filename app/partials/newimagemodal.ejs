@@ -1,6 +1,6 @@
 <div class="modal" id="newImageModal">
   <div class="modal-dialog">
-    <h5>Adding a new image</h5>
+    <h4>Adding a new image</h4>
 
     <div class="newImageForm" data-bind="with: editingImage">
 
@@ -19,7 +19,7 @@
       
       <div class="buttonsContainer">
         <button class="button" data-dismiss="modal">Close</button>
-        <button class="button" type="button" data-dismiss="modal" data-bind="click: function() { $root.addImage(JSON.parse(ko.toJSON(this, null, 2))); }">Save</button>
+        <button class="button" data-dismiss="modal" data-bind="click: function() { $root.addImage(JSON.parse(ko.toJSON(this, null, 2))); }">Save</button>
       </div>
     </div>
 

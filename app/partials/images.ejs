@@ -7,7 +7,8 @@
     <div class="panel-header">
       <div class="buttonbar">
         <a class="button" data-toggle="modal" data-target="#newImageModal" data-bind="click: function() { editingImage(new Image()) }">Create</a>
-        <!-- <a class="button" data-bind="click: function() { console.log(JSON.parse(ko.toJSON(activeImage().sizes()[1], null, 2))) }">Debug</a> -->
+        <a class="button" data-bind="click: function() { console.log(JSON.parse(ko.toJSON(activeImage(), null, 2))) }">Debug</a>
+        <!-- <button class="button" data-dismiss="modal" data-bind="click: function() { $root.addImage(JSON.parse(ko.toJSON(this, null, 2))); }">Save</button> -->
       </div>
     </div>
 

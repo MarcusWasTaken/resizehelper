@@ -6,7 +6,7 @@
     <div class="panel-header"></div>
 
     <h4>Pinned devices</h4>
-    <table class="table">
+    <table class="table devicesTable">
       <thead>
         <th>Name</th>
         <th>Width</th>
@@ -18,37 +18,39 @@
         <tr>
           <td data-bind="text: name"></td>
           <td>
-            <span data-bind="text: width"></span> (x<span data-bind="text:density" style=""></span>)
+            <span data-bind="text: width"></span> (x<span data-bind="text: density"></span>)
           </td>
-          <!-- <td data-bind="text: density"></td> -->
           <td data-bind="text: usingSize"></td>
           <td data-bind="text: lossOutput"></td>
-          <td><span data-bind="click: function() { toggleFlag() }" style="cursor: pointer;" class="glyphicon glyphicon-pushpin"></span></td>
-          
+          <td><span class="pinIcon active" data-bind="click: function() { toggleFlag() }"></span></td>
         </tr>
       </tbody>
     </table>
 
-    <h4>Other devices</h4>
-    <table class="table">
-      <thead>
-        <th>Name</th>
-        <th>Width</th>
-        <th title="which image size that results in the least loss">Using size</th>
-        <th title="how much of the image that is essentialy lost in the resize because the used size is bigger than the devices viewport">Loss</th>
-        <th></th>
-      </thead>
-      <tbody data-bind="foreach: _.filter(devices(), function(item) { return item.flagged() === false })">
-        <tr>
-          <td data-bind="text: name"></td>
-          <td>
-            <span data-bind="text: width"></span> (x<span data-bind="text:density" style=""></span>)
-          </td>
-          <td data-bind="text: usingSize"></td>
-          <td data-bind="text: lossOutput"></td>
-          <td><span data-bind="click: function() { toggleFlag() }" style="cursor: pointer; color: #ccc;" class="glyphicon glyphicon-pushpin"></span></td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="component">
+      <h4 class="component-header">All devices</h4>
+      <div class="component-body">
+        <table class="table devicesTable">
+          <thead>
+            <th>Name</th>
+            <th>Width</th>
+            <th title="which image size that results in the least loss">Using size</th>
+            <th title="how much of the image that is essentialy lost in the resize because the used size is bigger than the devices viewport">Loss</th>
+            <th></th>
+          </thead>
+          <tbody data-bind="foreach: devices">
+            <tr>
+              <td data-bind="text: name"></td>
+              <td>
+                <span data-bind="text: width"></span> (x<span data-bind="text: density"></span>)
+              </td>
+              <td data-bind="text: usingSize"></td>
+              <td data-bind="text: lossOutput"></td>
+              <td><span class="pinIcon" data-bind="click: function() { toggleFlag() }, css: { active: flagged }"></span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>    
   </div>
 </div>
